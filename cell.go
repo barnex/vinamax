@@ -12,7 +12,7 @@ type Cell struct {
 	m                Vector      // sum of child+particle magnetizations
 	b0               Vector      // Field in cell center
 	dbdx, dbdy, dbdz Vector      // Derivatives for Taylor expansion of field around center
-	Particle         []*Particle // If I'm a leaf cell, particles inside me (nil otherwise)
+	particle         []*Particle // If I'm a leaf cell, particles inside me (nil otherwise)
 }
 
 func (c *Cell) UpdateB(parent *Cell) {
@@ -54,7 +54,7 @@ func (c *Cell) UpdateB(parent *Cell) {
 	}
 
 	// if leaf cell:
-	for _, dst := range c.Particle {
+	for _, dst := range c.particle {
 
 		// start with field from cell's Taylor expansion:
 		sh := dst.Center().Sub(c.center)
@@ -62,7 +62,7 @@ func (c *Cell) UpdateB(parent *Cell) {
 
 		// then add, in a brute-force way, the near particle's fields
 		for _, n := range c.near {
-			for _, src := range n.Particle {
+			for _, src := range n.particle {
 				r := dst.Center().Sub(src.Center())
 				if r.Dot(r) != 0 { // exclude self
 					B := DipoleField(src.m, r)
@@ -80,8 +80,8 @@ func (c *Cell) UpdateM() {
 	c.m = Vector{0, 0, 0}
 
 	// leaf node: sum particle m's.
-	if c.Particle != nil {
-		for _, p := range c.Particle {
+	if c.particle != nil {
+		for _, p := range c.particle {
 			c.m = c.m.Add(p.m)
 		}
 		return
