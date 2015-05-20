@@ -11,7 +11,7 @@ import (
 var f *os.File
 var err error
 var twrite float64
-var locations []vector
+var locations []Vector
 var filecounter int = 0
 var output_B_ext = false
 var output_Dt = false
@@ -54,20 +54,20 @@ func check(e error) {
 }
 
 //calculates the average magnetisation components of all particles
-func averages(lijst []*particle) vector {
-	avgs := vector{0, 0, 0}
+func averages(lijst []*Particle) Vector {
+	avgs := Vector{0, 0, 0}
 	for i := range lijst {
 		avgs[0] += lijst[i].m[0]
 		avgs[1] += lijst[i].m[1]
 		avgs[2] += lijst[i].m[2]
 	}
-	return avgs.times(1. / float64(len(lijst)))
+	return avgs.Times(1. / float64(len(lijst)))
 }
 
 //calculates the average moments of all particles
 //TODO weigh with msat
-func averagemoments(lijst []*particle) vector {
-	avgs := vector{0, 0, 0}
+func averagemoments(lijst []*Particle) Vector {
+	avgs := Vector{0, 0, 0}
 	totalvolume := 0.
 	for i := range lijst {
 		radius := lijst[i].r
@@ -78,11 +78,11 @@ func averagemoments(lijst []*particle) vector {
 		avgs[2] += lijst[i].m[2] * volume
 	}
 	//divide by total volume
-	return avgs.times(1. / totalvolume)
+	return avgs.Times(1. / totalvolume)
 }
 
 //calculates the dotproduct of the average moments and the effective field of all particles
-func averagemdoth(lijst []*particle) float64 {
+func averagemdoth(lijst []*Particle) float64 {
 	avg := 0.
 	for i := range lijst {
 		xcomp := lijst[i].m[0] * lijst[i].heff[0]
@@ -94,7 +94,7 @@ func averagemdoth(lijst []*particle) float64 {
 }
 
 //returns the number of particles with m_z larger than 0
-func nrmzpositive(lijst []*particle) int {
+func nrmzpositive(lijst []*Particle) int {
 	counter := 0
 	for i := range lijst {
 		if lijst[i].m[2] > 0. {
@@ -157,12 +157,12 @@ func Tableadd_b_at_location(x, y, z float64) {
 	if outputinterval != 0 {
 		log.Fatal("Output() should always come AFTER Tableadd_b_at_location()")
 	}
-	locations = append(locations, vector{x, y, z})
+	locations = append(locations, Vector{x, y, z})
 
 }
 
 //Writes the time and the vector of average magnetisation in the table
-func write(avg vector) {
+func write(avg Vector) {
 	if twrite >= outputinterval && outputinterval != 0 {
 		string := fmt.Sprintf("%e\t%v\t%v\t%v", T, avg[0], avg[1], avg[2])
 		_, err = f.WriteString(string)

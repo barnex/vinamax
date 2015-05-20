@@ -16,17 +16,17 @@ type node struct {
 	brb *node
 	brf *node
 
-	origin   vector      //the origin of the cube
+	origin   Vector      //the origin of the cube
 	diameter float64     //the diameter
-	com      vector      //centreofmagnetisation
+	com      Vector      //centreofmagnetisation
 	number   int64       //numberofparticles
-	lijst    []*particle //lijst met alle particles
+	lijst    []*Particle //lijst met alle particles
 	volume   float64     //the total volume of all particles in the node
-	m        vector      //magnetisation of the node
+	m        Vector      //magnetisation of the node
 }
 
 //adds particle to node
-func (n *node) add(p *particle) {
+func (n *node) add(p *Particle) {
 	n.lijst = append(n.lijst, p)
 }
 
@@ -47,7 +47,7 @@ func (n *node) calculatecom() {
 		total += prefactor
 
 	}
-	n.com = vector{comx / total, comy / total, comz / total}
+	n.com = Vector{comx / total, comy / total, comz / total}
 }
 
 //descends into the tree, needed for Maketree()
@@ -58,56 +58,56 @@ func (w *node) descend() {
 		//initialises the 8 subnodes
 
 		//tlb
-		pos := vector{w.origin[0] - w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] + w.diameter/4}
+		pos := Vector{w.origin[0] - w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] + w.diameter/4}
 		w.tlb = new(node)
 		w.tlb.origin = pos
 		w.tlb.diameter = w.diameter / 2
 
 		//tlf
-		pos = vector{w.origin[0] - w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] - w.diameter/4}
+		pos = Vector{w.origin[0] - w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] - w.diameter/4}
 		w.tlf = new(node)
 		w.tlf.origin = pos
 		w.tlf.diameter = w.diameter / 2
 
 		//trb
-		pos = vector{w.origin[0] + w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] + w.diameter/4}
+		pos = Vector{w.origin[0] + w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] + w.diameter/4}
 		w.trb = new(node)
 		w.trb.origin = pos
 		w.trb.diameter = w.diameter / 2
 
 		//trf
-		pos = vector{w.origin[0] + w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] - w.diameter/4}
+		pos = Vector{w.origin[0] + w.diameter/4, w.origin[1] + w.diameter/4, w.origin[2] - w.diameter/4}
 		w.trf = new(node)
 		w.trf.origin = pos
 		w.trf.diameter = w.diameter / 2
 
 		//blb
-		pos = vector{w.origin[0] - w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] + w.diameter/4}
+		pos = Vector{w.origin[0] - w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] + w.diameter/4}
 		w.blb = new(node)
 		w.blb.origin = pos
 		w.blb.diameter = w.diameter / 2
 
 		//blf
-		pos = vector{w.origin[0] - w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] - w.diameter/4}
+		pos = Vector{w.origin[0] - w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] - w.diameter/4}
 		w.blf = new(node)
 		w.blf.origin = pos
 		w.blf.diameter = w.diameter / 2
 
 		//brb
-		pos = vector{w.origin[0] + w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] + w.diameter/4}
+		pos = Vector{w.origin[0] + w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] + w.diameter/4}
 		w.brb = new(node)
 		w.brb.origin = pos
 		w.brb.diameter = w.diameter / 2
 
 		//brf
-		pos = vector{w.origin[0] + w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] - w.diameter/4}
+		pos = Vector{w.origin[0] + w.diameter/4, w.origin[1] - w.diameter/4, w.origin[2] - w.diameter/4}
 		w.brf = new(node)
 		w.brf.origin = pos
 		w.brf.diameter = w.diameter / 2
 
 		//for alle particles in node
 		for i := range w.lijst {
-			plaats := w.where(vector{w.lijst[i].x, w.lijst[i].y, w.lijst[i].z})
+			plaats := w.where(Vector{w.lijst[i].x, w.lijst[i].y, w.lijst[i].z})
 			switch plaats {
 			case 0:
 				w.tlb.number += 1
@@ -187,7 +187,7 @@ func Maketree() {
 }
 
 //returns the position of a particle in a node (in terms of subnode position), or -1 if the particle is not in the node
-func (n node) where(position vector) int {
+func (n node) where(position Vector) int {
 	//if not in node
 	if position[0] > n.origin[0]+n.diameter/2 || position[0] < n.origin[0]-n.diameter/2 || position[1] > n.origin[1]+n.diameter/2 || position[1] < n.origin[1]-n.diameter/2 || position[2] > n.origin[2]+n.diameter/2 || position[2] < n.origin[2]-n.diameter/2 {
 
@@ -272,43 +272,43 @@ func (w *node) calculatevolume() {
 func (w *node) calculatem() {
 	switch w.number {
 	case 0:
-		w.m = vector{0., 0., 0.}
+		w.m = Vector{0., 0., 0.}
 	case 1:
-		w.m = w.lijst[0].m.times(w.lijst[0].msat * w.volume)
+		w.m = w.lijst[0].m.Times(w.lijst[0].msat * w.volume)
 	default:
-		w.m = vector{0., 0., 0.}
+		w.m = Vector{0., 0., 0.}
 		//for every subnode
 		if w.tlb.number > 0 {
 			w.tlb.calculatem()
-			w.m = w.m.add(w.tlb.m)
+			w.m = w.m.Add(w.tlb.m)
 		}
 		if w.tlf.number > 0 {
 			w.tlf.calculatem()
-			w.m = w.m.add(w.tlf.m)
+			w.m = w.m.Add(w.tlf.m)
 		}
 		if w.trb.number > 0 {
 			w.trb.calculatem()
-			w.m = w.m.add(w.trb.m)
+			w.m = w.m.Add(w.trb.m)
 		}
 		if w.trf.number > 0 {
 			w.trf.calculatem()
-			w.m = w.m.add(w.trf.m)
+			w.m = w.m.Add(w.trf.m)
 		}
 		if w.blb.number > 0 {
 			w.blb.calculatem()
-			w.m = w.m.add(w.blb.m)
+			w.m = w.m.Add(w.blb.m)
 		}
 		if w.blf.number > 0 {
 			w.blf.calculatem()
-			w.m = w.m.add(w.blf.m)
+			w.m = w.m.Add(w.blf.m)
 		}
 		if w.brb.number > 0 {
 			w.brb.calculatem()
-			w.m = w.m.add(w.brb.m)
+			w.m = w.m.Add(w.brb.m)
 		}
 		if w.brf.number > 0 {
 			w.brf.calculatem()
-			w.m = w.m.add(w.brf.m)
+			w.m = w.m.Add(w.brf.m)
 		}
 	}
 }

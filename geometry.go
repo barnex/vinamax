@@ -24,8 +24,8 @@ func addparticle(x, y, z float64) bool {
 	//	return false
 	//}
 
-	if universe.inworld(vector{x, y, z}) {
-		a := particle{x: x, y: y, z: z, r: radius}
+	if universe.inworld(Vector{x, y, z}) {
+		a := Particle{x: x, y: y, z: z, r: radius}
 		universe.lijst = append(universe.lijst, &a)
 		universe.number += 1
 		msatcalled = false
@@ -85,11 +85,11 @@ func (c Cuboid) Addparticles(n int) {
 //Defines the universe, its center and its diameter
 func World(x, y, z, r float64) {
 	worldcalled = true
-	universe.origin = vector{x, y, z}
+	universe.origin = Vector{x, y, z}
 	universe.diameter = r
 }
 
-func (w node) inworld(r vector) bool {
+func (w node) inworld(r Vector) bool {
 	if r[0] < (w.origin[0] - w.diameter/2) {
 		return false
 	}

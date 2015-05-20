@@ -8,15 +8,15 @@ import (
 )
 
 //calculates the attempt frequency of a particle
-func attemptf1(p *particle) float64 {
+func attemptf1(p *Particle) float64 {
 	volume := cube(p.r) * 4. / 3. * math.Pi
 	hk := 2. * Ku1 / (p.msat * mu0)
 	gprime := Alpha * gamma0 * mu0 / (1. + (Alpha * Alpha))
 	delta := Ku1 * volume / (kb * Temp)
 	bx, by, bz := B_ext(T)
-	bextvector := vector{bx / mu0, by / mu0, bz / mu0}
-	hoverhk := math.Abs(bextvector.dot(p.u_anis)) / (hk)
-	if math.Signbit(bextvector.dot(p.m)) == false {
+	bextvector := Vector{bx / mu0, by / mu0, bz / mu0}
+	hoverhk := math.Abs(bextvector.Dot(p.u_anis)) / (hk)
+	if math.Signbit(bextvector.Dot(p.m)) == false {
 		hoverhk *= -1.
 	}
 	//works only with aligned particles with B_ext at the moment
@@ -26,7 +26,7 @@ func attemptf1(p *particle) float64 {
 }
 
 //calculates the attempt frequency of a particle
-func attemptf2(p *particle) float64 {
+func attemptf2(p *Particle) float64 {
 	volume := cube(p.r) * 4 / 3. * math.Pi
 	hk := 2. * Ku1 / (p.msat * mu0)
 
@@ -35,9 +35,9 @@ func attemptf2(p *particle) float64 {
 	delta := Ku1 * volume / (kb * Temp)
 
 	bx, by, bz := B_ext(T)
-	bextvector := vector{bx / mu0, by / mu0, bz / mu0}
-	hoverhk := math.Abs(bextvector.dot(p.u_anis)) / hk
-	if math.Signbit(bextvector.dot(p.m)) {
+	bextvector := Vector{bx / mu0, by / mu0, bz / mu0}
+	hoverhk := math.Abs(bextvector.Dot(p.u_anis)) / hk
+	if math.Signbit(bextvector.Dot(p.m)) {
 		hoverhk *= -1.
 	}
 
@@ -48,7 +48,7 @@ func attemptf2(p *particle) float64 {
 }
 
 //calculates the attempt frequency of a particle
-func attemptf3(p *particle) float64 {
+func attemptf3(p *Particle) float64 {
 	volume := cube(p.r) * 4 / 3. * math.Pi
 	hk := 2. * Ku1 / (p.msat * mu0)
 
@@ -57,9 +57,9 @@ func attemptf3(p *particle) float64 {
 	delta := Ku1 * volume / (kb * Temp)
 
 	bx, by, bz := B_ext(T)
-	bextvector := vector{bx / mu0, by / mu0, bz / mu0}
-	hoverhk := math.Abs(bextvector.dot(p.u_anis)) / hk
-	if math.Signbit(bextvector.dot(p.m)) {
+	bextvector := Vector{bx / mu0, by / mu0, bz / mu0}
+	hoverhk := math.Abs(bextvector.Dot(p.u_anis)) / hk
+	if math.Signbit(bextvector.Dot(p.m)) {
 		hoverhk *= -1.
 	}
 
@@ -70,7 +70,7 @@ func attemptf3(p *particle) float64 {
 }
 
 //calculates the next switching time
-func setswitchtime(p *particle) {
+func setswitchtime(p *Particle) {
 	prob := rng.Float64()
 
 	//TODO choose based on the barrier??? see which one corresponds when with brownian noise
@@ -83,7 +83,7 @@ func setswitchtime(p *particle) {
 }
 
 //checks if it's time to switch and if so, switch and calculate next switchtime
-func checkswitch(p *particle) {
+func checkswitch(p *Particle) {
 	if T > p.flip {
 		switchp(p)
 		setswitchtime(p)
@@ -91,19 +91,19 @@ func checkswitch(p *particle) {
 }
 
 //switches the magnetisation of a particle
-func switchp(p *particle) {
-	p.m = p.m.times(-1.)
+func switchp(p *Particle) {
+	p.m = p.m.Times(-1.)
 }
 
 //resets all switchtimes
-func resetswitchtimes(Lijst []*particle) {
+func resetswitchtimes(Lijst []*Particle) {
 	for _, p := range Lijst {
 		setswitchtime(p)
 	}
 }
 
 //checks switch for all particles
-func checkallswitch(Lijst []*particle) {
+func checkallswitch(Lijst []*Particle) {
 	for _, p := range Lijst {
 		checkswitch(p)
 	}

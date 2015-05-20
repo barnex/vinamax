@@ -8,47 +8,49 @@ import (
 )
 
 //A particle essentially constains a position, magnetisation
-type particle struct {
-	x, y, z             float64
-	m                   vector
-	demagnetising_field vector
-	u_anis              vector  // Uniaxial anisotropy axis
-	c1_anis             vector  // cubic anisotropy axis
-	c2_anis             vector  // cubic anisotropy axis
-	c3_anis             vector  // cubic anisotropy axis
-	r                   float64 // radius
-	msat                float64 // Saturation magnetisation in A/m
-	flip                float64 // time of next flip event
-	tempnumber          float64
+type Particle struct {
+	x, y, z    float64 // todo: vector
+	m          Vector
+	Bdemag     Vector
+	u_anis     Vector  // Uniaxial anisotropy axis
+	c1_anis    Vector  // cubic anisotropy axis
+	c2_anis    Vector  // cubic anisotropy axis
+	c3_anis    Vector  // cubic anisotropy axis
+	r          float64 // radius
+	msat       float64 // Saturation magnetisation in A/m
+	flip       float64 // time of next flip event
+	tempnumber float64
 
-	heff      vector //effective field
-	tempfield vector
-	tempm     vector
-	previousm vector
-	fehlk1    vector
-	fehlk2    vector
-	fehlk3    vector
-	fehlk4    vector
-	fehlk5    vector
-	fehlk6    vector
-	fehlk7    vector
-	fehlk8    vector
-	fehlk9    vector
-	fehlk10   vector
-	fehlk11   vector
-	fehlk12   vector
-	fehlk13   vector
+	heff      Vector //effective field
+	tempfield Vector
+	tempm     Vector
+	previousm Vector
+	fehlk1    Vector
+	fehlk2    Vector
+	fehlk3    Vector
+	fehlk4    Vector
+	fehlk5    Vector
+	fehlk6    Vector
+	fehlk7    Vector
+	fehlk8    Vector
+	fehlk9    Vector
+	fehlk10   Vector
+	fehlk11   Vector
+	fehlk12   Vector
+	fehlk13   Vector
 }
 
+func (p Particle) Center() Vector { return Vector{p.x, p.y, p.z} }
+
 //print position and magnitisation of a particle
-func (p particle) string() string {
+func (p Particle) string() string {
 	return fmt.Sprintf("particle@(%v, %v, %v), %v %v %v", p.x, p.y, p.z, p.m[0], p.m[1], p.m[2])
 }
 
 //Gives all particles the same specified uniaxialanisotropy-axis
 func Anisotropy_axis(x, y, z float64) {
 	uaniscalled = true
-	a := norm(vector{x, y, z})
+	a := norm(Vector{x, y, z})
 	for i := range universe.lijst {
 		universe.lijst[i].u_anis = a
 	}
@@ -57,7 +59,7 @@ func Anisotropy_axis(x, y, z float64) {
 //Gives all particles the same specified cubic1anisotropy-axis
 func C1anisotropy_axis(x, y, z float64) {
 	c1called = true
-	a := norm(vector{x, y, z})
+	a := norm(Vector{x, y, z})
 	for i := range universe.lijst {
 		universe.lijst[i].c1_anis = a
 	}
@@ -66,11 +68,11 @@ func C1anisotropy_axis(x, y, z float64) {
 //Gives all particles the same specified cubic2anisotropy-axis, must be orthogonal to c1
 func C2anisotropy_axis(x, y, z float64) {
 	c2called = true
-	a := norm(vector{x, y, z})
+	a := norm(Vector{x, y, z})
 	for i := range universe.lijst {
-		if universe.lijst[i].c1_anis.dot(a) == 0 {
+		if universe.lijst[i].c1_anis.Dot(a) == 0 {
 			universe.lijst[i].c2_anis = a
-			universe.lijst[i].c3_anis = norm(universe.lijst[i].c1_anis.cross(a))
+			universe.lijst[i].c3_anis = norm(universe.lijst[i].c1_anis.Cross(a))
 		} else {
 			log.Fatal("c1 and c2 should be orthogonal")
 		}
@@ -83,9 +85,9 @@ func Anisotropy_random() {
 	for i := range universe.lijst {
 		phi := rng.Float64() * (2 * math.Pi)
 		theta := 2 * math.Asin(math.Sqrt(rng.Float64()))
-		universe.lijst[i].u_anis = vector{math.Sin(theta) * math.Cos(phi), math.Sin(theta) * math.Sin(phi), math.Cos(theta)}
+		universe.lijst[i].u_anis = Vector{math.Sin(theta) * math.Cos(phi), math.Sin(theta) * math.Sin(phi), math.Cos(theta)}
 		if math.Cos(theta) < 0. {
-			universe.lijst[i].u_anis = universe.lijst[i].u_anis.times(-1.)
+			universe.lijst[i].u_anis = universe.lijst[i].u_anis.Times(-1.)
 		}
 	}
 }
@@ -96,7 +98,7 @@ func M_random() {
 	for i := range universe.lijst {
 		phi := rng.Float64() * (2 * math.Pi)
 		theta := 2 * math.Asin(math.Sqrt(rng.Float64()))
-		universe.lijst[i].m = vector{math.Sin(theta) * math.Cos(phi), math.Sin(theta) * math.Sin(phi), math.Cos(theta)}
+		universe.lijst[i].m = Vector{math.Sin(theta) * math.Cos(phi), math.Sin(theta) * math.Sin(phi), math.Cos(theta)}
 	}
 }
 
@@ -121,7 +123,7 @@ func M_MSM(tmag, field float64) {
 		if r.Float64() < up {
 			universe.lijst[i].m = universe.lijst[i].u_anis
 		} else {
-			universe.lijst[i].m = universe.lijst[i].u_anis.times(-1.)
+			universe.lijst[i].m = universe.lijst[i].u_anis.Times(-1.)
 		}
 	}
 }
@@ -129,7 +131,7 @@ func M_MSM(tmag, field float64) {
 //Gives all particles a specified magnetisation direction
 func M_uniform(x, y, z float64) {
 	magnetisationcalled = true
-	a := norm(vector{x, y, z})
+	a := norm(Vector{x, y, z})
 	for i := range universe.lijst {
 		universe.lijst[i].m = a
 	}

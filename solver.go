@@ -210,7 +210,7 @@ func Run(time float64) {
 //##################################################
 
 //Perform a timestep using euler forward method
-func eulerstep(Lijst []*particle) {
+func eulerstep(Lijst []*Particle) {
 	for _, p := range Lijst {
 		temp := p.temp()
 
@@ -227,7 +227,7 @@ func eulerstep(Lijst []*particle) {
 //#########################################################################
 //perform a timestep using heun method
 //http://en.wikipedia.org/wiki/Heun_method
-func heunstep(Lijst []*particle) {
+func heunstep(Lijst []*Particle) {
 	for _, p := range Lijst {
 		temp := p.temp()
 		p.tempfield = temp
@@ -275,7 +275,7 @@ func heunstep(Lijst []*particle) {
 //#########################################################################
 
 //perform a timestep using 3th order RK
-func rk3step(Lijst []*particle) {
+func rk3step(Lijst []*Particle) {
 	for _, p := range Lijst {
 		temp := p.temp()
 		p.tempfield = temp
@@ -336,7 +336,7 @@ func rk3step(Lijst []*particle) {
 //#########################################################################
 
 //perform a timestep using 3th order anneliessolver
-func anneliesstep(Lijst []*particle) {
+func anneliesstep(Lijst []*Particle) {
 	for _, p := range Lijst {
 		temp := p.temp()
 		p.tempfield = temp
@@ -372,9 +372,9 @@ func anneliesstep(Lijst []*particle) {
 		k3 := p.tau(temp)
 		k1 := p.fehlk1
 		k2 := p.fehlk2
-		p.m[0] += (((89./33.+2189./5746.)*k1[0] +(-475./126-2310./2873.)*k2[0] + 2873/1386.*k3[0]) * Dt)
-		p.m[1] += (((89./33.+2189./5746.)*k1[1] +(-475./126-2310./2873.)*k2[1] + 2873/1386.*k3[1]) * Dt)
-		p.m[2] += (((89./33.+2189./5746.)*k1[2] +(-475./126-2310./2873.)*k2[2] + 2873/1386.*k3[2]) * Dt)
+		p.m[0] += (((89./33.+2189./5746.)*k1[0] + (-475./126-2310./2873.)*k2[0] + 2873/1386.*k3[0]) * Dt)
+		p.m[1] += (((89./33.+2189./5746.)*k1[1] + (-475./126-2310./2873.)*k2[1] + 2873/1386.*k3[1]) * Dt)
+		p.m[2] += (((89./33.+2189./5746.)*k1[2] + (-475./126-2310./2873.)*k2[2] + 2873/1386.*k3[2]) * Dt)
 		T += (-11/26. + 1.) * Dt
 
 		p.m = norm(p.m)
@@ -398,7 +398,7 @@ func anneliesstep(Lijst []*particle) {
 //#########################################################################
 
 //perform a timestep using 4th order RK
-func rk4step(Lijst []*particle) {
+func rk4step(Lijst []*Particle) {
 	for _, p := range Lijst {
 		temp := p.temp()
 		tau0 := p.tau(temp)
@@ -474,7 +474,7 @@ func rk4step(Lijst []*particle) {
 
 // Gebruik maken van de FSAL (enkel bij niet-brown noise!!!)
 
-func dopristep(Lijst []*particle) {
+func dopristep(Lijst []*Particle) {
 	for _, p := range Lijst {
 		p.tempm = p.m
 		p.previousm = p.m
@@ -618,7 +618,7 @@ func dopristep(Lijst []*particle) {
 ///#########################################################################
 //perform a timestep using fehlberg 56 method
 
-func fehl56step(Lijst []*particle) {
+func fehl56step(Lijst []*Particle) {
 	for _, p := range Lijst {
 		p.tempm = p.m
 		p.previousm = p.m
@@ -789,7 +789,7 @@ func fehl56step(Lijst []*particle) {
 
 //perform a timestep using fehlberg 67 method
 
-func fehl67step(Lijst []*particle) {
+func fehl67step(Lijst []*Particle) {
 	for _, p := range Lijst {
 		p.tempm = p.m
 		p.previousm = p.m
@@ -1072,7 +1072,7 @@ func fehl67step(Lijst []*particle) {
 
 //###########################################################################################################
 
-func undobadstep(Lijst []*particle) {
+func undobadstep(Lijst []*Particle) {
 	for _, p := range Lijst {
 		p.m = p.previousm
 	}
